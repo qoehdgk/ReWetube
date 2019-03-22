@@ -7,10 +7,18 @@ const ENTRY_FILE = path.resolve(__dirname, "assets", "js", "main.js");
 const OUTPUT_DIR = path.join(__dirname, "static");
 
 const config = {
-  entry: ENTRY_FILE,
+  entry: ["@babel/polyfill", ENTRY_FILE],
   mode: MODE,
   module: {
     rules: [
+      {
+        test: /\.(js)$/,
+        use: [
+          {
+            loader: "babel-loader"
+          }
+        ]
+      },
       {
         test: /\.(scss)$/,
         use: ExtractCSS.extract([
@@ -18,14 +26,16 @@ const config = {
             loader: "css-loader"
           },
           {
+            // postcss-loader 는 주는 plugin 을 가지고 CSS를 변환해준다. ex) 익스플로러
             loader: "postcss-loader",
             options: {
-              plugin() {
+              plugins() {
                 return [autoprefixer({ browsers: "cover 99.5%" })];
               }
             }
           },
           {
+            // sass -loader는 scss 나 sass 를 번역해준다.
             loader: "sass-loader"
           }
         ])
@@ -34,7 +44,7 @@ const config = {
   },
   output: {
     path: OUTPUT_DIR,
-    filename: "[name].[format]"
+    filename: "[name].js"
   },
   plugins: [new ExtractCSS("styles.css")]
 };
